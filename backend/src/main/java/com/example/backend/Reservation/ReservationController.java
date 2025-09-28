@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    // 이 서비스는 잠시 후 ReservationService에서 만들 예정입니다.
     private final ReservationService reservationService;
 
     @GetMapping("/preview")

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class PayService {
     private final RoomRepository roomRepository;
     private final PaymentRepository paymentRepository; // Payment(카드정보)를 위한 Repository
 
-    @Transactional // 이 메서드 내의 모든 DB 작업은 하나의 트랜잭션으로 묶입니다.
+    @Transactional
     public Long processPaymentAndCreateReservation(FinalPaymentRequestDto requestDto, Long userId) {
         // 1. 필요한 엔티티 조회
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -35,6 +36,16 @@ public class PayService {
         // 사용자가 선택한 카드가 유효하고, 본인의 카드인지 확인
         Payment payment = paymentRepository.findByIdAndUserId(requestDto.getPaymentId(), userId)
                 .orElseThrow(() -> new RuntimeException("Payment method not found or not authorized"));
+
+        //겹치는 예약있으면 실행 X
+        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                requestDto.getRoomId(),
+                requestDto.getCheckInDate(),
+                requestDto.getCheckOutDate()
+        );
+        if (!overlappingReservations.isEmpty()) {
+            throw new IllegalStateException("해당 날짜에 이미 예약된 방입니다.");
+        }
 
         // 2. 가격 계산
         long nights = ChronoUnit.DAYS.between(requestDto.getCheckInDate(), requestDto.getCheckOutDate());
