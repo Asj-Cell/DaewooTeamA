@@ -1,7 +1,4 @@
--- Docker 환경 변수가 데이터베이스와 사용자를 생성하므로, 여기서는 USE 문만 사용합니다.
-USE `booking_db`;
-
--- 2. 테이블 초기화 (참조 관계의 역순으로 삭제)
+-- 1. 테이블 초기화 (참조 관계의 역순으로 삭제)
 DROP TABLE IF EXISTS `pay`;
 DROP TABLE IF EXISTS `payment`;
 DROP TABLE IF EXISTS `review`;
@@ -19,7 +16,7 @@ DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `user`;
 
 
--- 3. 테이블 생성 (DDL)
+-- 2. 테이블 생성 (DDL)
 
 -- 사용자 테이블
 CREATE TABLE `user` (
@@ -237,10 +234,9 @@ CREATE TABLE `pay` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- 4. 데이터 삽입 (DML)
+-- 3. 데이터 삽입 (DML)
 
 -- 사용자 데이터
-LOCK TABLES `user` WRITE;
 INSERT INTO `user` (`id`, `user_name`, `email`, `password`, `phone_number`, `address`, `birth_date`, `image_url`, `background_image_url`)
 VALUES
     (1, '김민준', 'minjun.kim@example.com', '$2a$10$E/a3J5..L27GjQW3.p2yC.i2u.j5.a1b.c1d.e1f.g1h', '010-1234-5678', '서울시 강남구', '1990-01-15', '/uploads/profile1.png', '/uploads/bg1.png'),
@@ -248,17 +244,13 @@ VALUES
     (3, '박준호', 'junho.park@example.com', '$2a$10$E/a3J5..L27GjQW3.p2yC.i2u.j5.a1b.c1d.e1f.g1h', '010-3456-7890', '인천시 연수구', '1988-08-10', '/uploads/profile3.png', '/uploads/bg3.png'),
     (4, '최지우', 'jiwoo.choi@example.com', '$2a$10$E/a3J5..L27GjQW3.p2yC.i2u.j5.a1b.c1d.e1f.g1h', '010-4567-8901', '대구시 수성구', '1995-11-25', '/uploads/profile4.png', '/uploads/bg4.png'),
     (5, '정유진', 'yujin.jung@example.com', '$2a$10$E/a3J5..L27GjQW3.p2yC.i2u.j5.a1b.c1d.e1f.g1h', '010-5678-9012', '광주시 서구', '1998-03-30', '/uploads/profile5.png', '/uploads/bg5.png');
-UNLOCK TABLES;
 
 -- 도시 데이터
-LOCK TABLES `city` WRITE;
 INSERT INTO `city` (`id`, `city_name`) VALUES
                                            (1, '서울'), (2, '부산'), (3, '제주'), (4, '인천'), (5, '경주'),
                                            (6, '파리'), (7, '런던'), (8, '도쿄'), (9, '뉴욕'), (10, '방콕');
-UNLOCK TABLES;
 
 -- 호텔 데이터
-LOCK TABLES `hotel` WRITE;
 INSERT INTO `hotel` (`id`, `name`, `grade`, `overview`, `latitude`, `longitude`, `address`, `checkin_time`, `checkout_time`, `city_id`) VALUES
                                                                                                                                             (1, '신라호텔', 5, '최고급 서비스와 시설', 37.5558, 127.0053, '서울시 중구 동호로 249', '15:00:00', '12:00:00', 1),
                                                                                                                                             (2, '파라다이스 호텔 부산', 5, '해운대 해변의 럭셔리 호텔', 35.1598, 129.1603, '부산시 해운대구 해운대해변로 296', '15:00:00', '11:00:00', 2),
@@ -268,23 +260,17 @@ INSERT INTO `hotel` (`id`, `name`, `grade`, `overview`, `latitude`, `longitude`,
                                                                                                                                             (6, '리츠 파리', 5, '파리 중심부의 상징적인 호텔', 48.8679, 2.3275, '15 Place Vendôme, 75001 Paris, France', '15:00:00', '12:00:00', 6),
                                                                                                                                             (7, '더 사보이', 5, '런던의 역사와 전통을 자랑하는 호텔', 51.5100, -0.1207, 'Strand, London WC2R 0EZ, UK', '15:00:00', '12:00:00', 7),
                                                                                                                                             (8, '파크 하얏트 도쿄', 5, '신주쿠의 전망을 즐길 수 있는 호텔', 35.6850, 139.6900, '3-7-1-2 Nishi-Shinjuku, Shinjuku-ku, Tokyo, Japan', '15:00:00', '12:00:00', 8);
-UNLOCK TABLES;
 
 -- 호텔별 무료 서비스 및 편의시설 데이터
-LOCK TABLES `freebies` WRITE;
 INSERT INTO `freebies` (`id`, `breakfast_included`, `free_parking`, `free_wifi`, `airport_shuttlebus`, `free_cancellation`, `hotel_id`) VALUES
                                                                                                                                             (1, 1, 1, 1, 1, 1, 1), (2, 0, 1, 1, 1, 1, 2), (3, 1, 1, 1, 1, 0, 3), (4, 1, 1, 1, 0, 1, 4),
                                                                                                                                             (5, 0, 1, 1, 0, 1, 5), (6, 1, 0, 1, 1, 0, 6), (7, 1, 0, 1, 1, 1, 7), (8, 1, 1, 1, 0, 1, 8);
-UNLOCK TABLES;
 
-LOCK TABLES `amenities` WRITE;
 INSERT INTO `amenities` (`id`, `front_desk24`, `outdoor_pool`, `indoor_pool`, `spa_wellness_center`, `restaurant`, `roomservice`, `fitness_center`, `bar_lounge`, `tea_coffee_machine`, `airconditioning`, `hotel_id`) VALUES
                                                                                                                                                                                                                            (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), (2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2), (3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3), (4, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 4),
                                                                                                                                                                                                                            (5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5), (6, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 6), (7, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 7), (8, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 8);
-UNLOCK TABLES;
 
 -- 객실 데이터
-LOCK TABLES `room` WRITE;
 INSERT INTO `room` (`id`, `room_number`, `price`, `name`, `view`, `bed`, `max_guests`, `hotel_id`) VALUES
                                                                                                        (1, '101', 250000.00, '스탠다드', '시티 뷰', '더블 베드', 2, 1), (2, '102', 350000.00, '디럭스', '시티 뷰', '킹 베드', 2, 1),
                                                                                                        (3, '201', 300000.00, '스탠다드 오션', '오션 뷰', '더블 베드', 2, 2), (4, '202', 400000.00, '디럭스 오션', '오션 뷰', '킹 베드', 2, 2),
@@ -294,10 +280,8 @@ INSERT INTO `room` (`id`, `room_number`, `price`, `name`, `view`, `bed`, `max_gu
                                                                                                        (11, '601', 800000.00, '스위트', '에펠탑 뷰', '킹 베드', 2, 6), (12, '602', 950000.00, '프레스티지 스위트', '에펠탑 뷰', '킹 베드', 3, 6),
                                                                                                        (13, '701', 750000.00, '디럭스 킹', '템즈강 뷰', '킹 베드', 2, 7), (14, '702', 900000.00, '원 베드룸 스위트', '템즈강 뷰', '킹 베드', 3, 7),
                                                                                                        (15, '801', 650000.00, '파크 뷰 킹', '신주쿠 파크 뷰', '킹 베드', 2, 8), (16, '802', 850000.00, '파크 스위트', '신주쿠 파크 뷰', '킹 베드', 3, 8);
-UNLOCK TABLES;
 
 -- 객실 이미지 데이터
-LOCK TABLES `room_img` WRITE;
 INSERT INTO `room_img` (`id`, `image_url`, `size`, `room_id`) VALUES
                                                                   (1, '/images/hotel1/room1.png', 512, 1), (2, '/images/hotel1/room2.png', 512, 2),
                                                                   (3, '/images/hotel2/room1.png', 512, 3), (4, '/images/hotel2/room2.png', 512, 4),
@@ -307,10 +291,8 @@ INSERT INTO `room_img` (`id`, `image_url`, `size`, `room_id`) VALUES
                                                                   (11, '/images/hotel6/room1.png', 512, 11), (12, '/images/hotel6/room2.png', 512, 12),
                                                                   (13, '/images/hotel7/room1.png', 512, 13), (14, '/images/hotel7/room2.png', 512, 14),
                                                                   (15, '/images/hotel8/room1.png', 512, 15), (16, '/images/hotel8/room2.png', 512, 16);
-UNLOCK TABLES;
 
 -- 호텔 이미지 데이터
-LOCK TABLES `hotel_image` WRITE;
 INSERT INTO `hotel_image` (`id`, `image_url`, `sequence`, `size`, `hotel_id`) VALUES
                                                                                   (1, '/images/hotel1/main.png', 1, 1024, 1), (2, '/images/hotel1/sub1.png', 2, 512, 1),
                                                                                   (3, '/images/hotel2/main.png', 1, 1024, 2), (4, '/images/hotel2/sub1.png', 2, 512, 2),
@@ -320,10 +302,8 @@ INSERT INTO `hotel_image` (`id`, `image_url`, `sequence`, `size`, `hotel_id`) VA
                                                                                   (11, '/images/hotel6/main.png', 1, 1024, 6), (12, '/images/hotel6/sub1.png', 2, 512, 6),
                                                                                   (13, '/images/hotel7/main.png', 1, 1024, 7), (14, '/images/hotel7/sub1.png', 2, 512, 7),
                                                                                   (15, '/images/hotel8/main.png', 1, 1024, 8), (16, '/images/hotel8/sub1.png', 2, 512, 8);
-UNLOCK TABLES;
 
 -- 여행 패키지 데이터
-LOCK TABLES `travel_package` WRITE;
 INSERT INTO `travel_package` (`id`, `title`, `description`, `price`, `st_date`, `end_date`, `city_id`) VALUES
                                                                                                            (1, '서울 2박 3일 시티 투어', '서울의 주요 관광지인 경복궁, 명동, N서울타워를 둘러보는 알찬 패키지입니다.', 350000.00, '2025-10-10', '2025-10-12', 1),
                                                                                                            (2, '부산 3박 4일 미식 여행', '부산의 명물인 돼지국밥, 씨앗호떡, 해산물 맛집을 탐방하는 미식 여행 패키지입니다.', 450000.00, '2025-11-15', '2025-11-18', 2),
@@ -331,26 +311,20 @@ INSERT INTO `travel_package` (`id`, `title`, `description`, `price`, `st_date`, 
                                                                                                            (4, '파리 4박 5일 예술 기행', '루브르 박물관, 오르세 미술관, 에펠탑 등 파리의 예술과 낭만을 만끽하는 여행입니다.', 1200000.00, '2026-01-10', '2026-01-14', 6),
                                                                                                            (5, '런던 3박 4일 클래식 투어', '버킹엄 궁전, 타워 브리지, 대영 박물관 등 런던의 역사를 체험하는 클래식 투어입니다.', 1100000.00, '2026-02-05', '2026-02-08', 7),
                                                                                                            (6, '도쿄 3박 4일 미식 탐방', '츠키지 시장, 시부야, 신주쿠의 유명 맛집을 탐방하며 도쿄의 맛을 즐기는 여행입니다.', 950000.00, '2026-03-12', '2026-03-15', 8);
-UNLOCK TABLES;
 
 -- 패키지 이미지 데이터
-LOCK TABLES `package_image` WRITE;
 INSERT INTO `package_image` (`id`, `image_url`, `package_id`) VALUES
                                                                   (1, '/images/package1/package1_1.png', 1), (2, '/images/package1/package1_2.png', 1),
                                                                   (3, '/images/package1/package1_3.png', 1), (4, '/images/package1/package1_4.png', 1),
                                                                   (5, '/images/package2/package2_1.png', 2), (6, '/images/package3/package3_1.png', 3),
                                                                   (7, '/images/package4/package4_1.png', 4), (8, '/images/package5/package5_1.png', 5),
                                                                   (9, '/images/package6/package6_1.png', 6);
-UNLOCK TABLES;
 
 -- 찜 목록 데이터
-LOCK TABLES `favorites` WRITE;
 INSERT INTO `favorites` (`id`, `user_id`, `hotel_id`) VALUES
                                                           (1, 1, 2), (2, 1, 3), (3, 2, 1), (4, 3, 5), (5, 4, 8), (6, 5, 7);
-UNLOCK TABLES;
 
 -- 리뷰 데이터
-LOCK TABLES `review` WRITE;
 INSERT INTO `review` (`id`, `user_id`, `hotel_id`, `content`, `user_rating_score`) VALUES
                                                                                        (1, 1, 1, '서비스가 매우 만족스러웠습니다. 직원들이 친절하고 시설도 깨끗합니다.', 4.5),
                                                                                        (2, 2, 2, '오션 뷰가 정말 멋졌어요. 다시 방문하고 싶습니다.', 5.0),
@@ -360,34 +334,27 @@ INSERT INTO `review` (`id`, `user_id`, `hotel_id`, `content`, `user_rating_score
                                                                                        (6, 1, 6, '파리의 중심에서 럭셔리한 경험을 했습니다. 잊지 못할 거예요.', 5.0),
                                                                                        (7, 2, 7, '역사와 전통이 느껴지는 멋진 호텔이었습니다.', 4.7),
                                                                                        (8, 3, 8, '신주쿠의 야경이 한눈에 들어오는 전망이 최고였습니다.', 4.9);
-UNLOCK TABLES;
 
 -- 예약 데이터
-LOCK TABLES `reservation` WRITE;
 INSERT INTO `reservation` (`id`, `user_id`, `room_id`, `check_in_date`, `check_out_date`, `discount`, `taxes`, `total_price`) VALUES
                                                                                                                                   (1, 1, 2, '2025-10-10', '2025-10-12', 50000.00, 30000.00, 680000.00),
                                                                                                                                   (2, 2, 3, '2025-11-15', '2025-11-18', 100000.00, 80000.00, 1180000.00),
                                                                                                                                   (3, 3, 5, '2025-12-20', '2025-12-22', 30000.00, 19000.00, 429000.00),
                                                                                                                                   (4, 4, 14, '2026-02-05', '2026-02-07', 70000.00, 83000.00, 1713000.00),
                                                                                                                                   (5, 5, 16, '2026-03-12', '2026-03-14', 20000.00, 168000.00, 1848000.00);
-UNLOCK TABLES;
 
 -- 결제 수단 데이터
-LOCK TABLES `payment` WRITE;
 INSERT INTO `payment` (`id`, `user_id`, `payment_name`, `payment_number`, `expiration_date`, `cvc`, `card_user`, `country`, `registration_date`) VALUES
                                                                                                                                                      (1, 1, '신한카드', '1234-5678-9012-3456', '2028-12-31', '123', '김민준', '대한민국', '2025-01-15 10:00:00'),
                                                                                                                                                      (2, 2, '국민카드', '2345-6789-0123-4567', '2027-11-30', '234', '이서연', '대한민국', '2025-02-20 11:30:00'),
                                                                                                                                                      (3, 3, '삼성카드', '3456-7890-1234-5678', '2029-10-31', '345', '박준호', '대한민국', '2025-03-25 14:00:00'),
                                                                                                                                                      (4, 4, '현대카드', '4567-8901-2345-6789', '2026-09-30', '456', '최지우', '대한민국', '2025-04-10 16:45:00'),
                                                                                                                                                      (5, 5, '우리카드', '5678-9012-3456-7890', '2028-08-31', '567', '정유진', '대한민국', '2025-05-12 18:20:00');
-UNLOCK TABLES;
 
 -- 결제 내역 데이터
-LOCK TABLES `pay` WRITE;
 INSERT INTO `pay` (`id`, `reservation_id`, `payment_id`, `user_id`, `payment_gateway`, `redate`, `price`) VALUES
                                                                                                               (1, 1, 1, 1, '카카오페이', '2025-10-01 14:00:00', 680000.00),
                                                                                                               (2, 2, 2, 2, '네이버페이', '2025-11-01 16:30:00', 1180000.00),
                                                                                                               (3, 3, 3, 3, '토스페이', '2025-12-01 18:00:00', 429000.00),
                                                                                                               (4, 4, 4, 4, '신용카드', '2026-01-20 20:15:00', 1713000.00),
                                                                                                               (5, 5, 5, 5, '계좌이체', '2026-02-20 22:00:00', 1848000.00);
-UNLOCK TABLES;
