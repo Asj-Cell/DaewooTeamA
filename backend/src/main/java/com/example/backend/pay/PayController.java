@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class PayController {
 
     private final PayService payService;
-
+    //헤더 키 Authorization -> 받은 토큰, Content-Type -> JSON
     @PostMapping
     public ResponseEntity<Long> processPaymentAndCreateReservation(@RequestBody FinalPaymentRequestDto requestDto,
                                                                    @AuthenticationPrincipal UserDetails userDetails) {
