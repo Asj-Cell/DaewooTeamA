@@ -5,6 +5,7 @@ import com.example.backend.payment.PaymentRepository;
 import com.example.backend.user.dto.*;
 import com.example.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,33 @@ public class UserService {
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
     private final FileStorageService fileStorageService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public void changeUserPassword(Long userId, ChangePasswordRequestDto requestDto) {
+        // 1. 새 비밀번호와 확인용 비밀번호가 일치하는지 확인
+        if (!requestDto.getNewPassword().equals(requestDto.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 2. 사용자 정보 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 소셜 로그인 사용자인 경우 비밀번호 변경 불가
+        if (user.getProvider() != null && !user.getProvider().isEmpty()) {
+            throw new IllegalArgumentException("소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.");
+        }
+
+        // 3. 현재 비밀번호가 맞는지 확인 (매우 중요!)
+        if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
+        }
+
+        // 4. 새 비밀번호를 암호화하여 저장
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        userRepository.save(user);
+    }
 
     @Transactional
     public String updateUserProfileImage(Long userId, MultipartFile imageFile) {
