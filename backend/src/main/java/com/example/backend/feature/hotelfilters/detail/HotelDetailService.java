@@ -10,13 +10,17 @@ import com.example.backend.room.dto.RoomDto;
 import com.example.backend.room.entity.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HotelDetailService {
 
     private final HotelRepository hotelRepository;
@@ -24,22 +28,26 @@ public class HotelDetailService {
     private final ReviewRepository reviewRepository;
     private final FavoritesRepository favoritesRepository;
 
-    public HotelDetailDto getHotelDetail(Long hotelId, Long loginUserId) {
+    public HotelDetailDto getHotelDetail(Long hotelId, Long loginUserId, LocalDate checkInDate, LocalDate checkOutDate) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));
 
-        // 1. 편의시설 리스트 변환
         List<String> amenities = getAmenitiesList(hotel);
 
-        // 2. 룸 리스트 변환
-        List<RoomDto> rooms = roomService.getRoomsByHotelId(hotelId);
+        // [수정] 룸 리스트를 가져온 뒤, 각 룸의 예약 가능 여부를 체크하는 로직 추가
+        List<RoomDto> rooms = roomService.getRoomsByHotelId(hotelId).stream()
+                .peek(roomDto -> {
+                    hotel.getRooms().stream()
+                            .filter(r -> r.getId().equals(roomDto.getId()))
+                            .findFirst()
+                            .ifPresent(roomEntity -> roomDto.setIsAvailable(isRoomAvailable(roomEntity, checkInDate, checkOutDate)));
+                })
+                .collect(Collectors.toList());
 
-        // 3. 리뷰 계산
         Double totalRating = reviewRepository.findTotalRatingByHotelId(hotelId);
         long reviewCount = reviewRepository.countByHotelId(hotelId);
         double avgRating = (totalRating != null && reviewCount > 0) ? totalRating / reviewCount : 0.0;
 
-        // 4. 찜 여부 (옵션)
         boolean isFavorite = (loginUserId != null) &&
                 favoritesRepository.existsByUser_IdAndHotel_Id(loginUserId, hotelId);
 
@@ -52,14 +60,13 @@ public class HotelDetailService {
                 .map(HotelImage::getImageUrl)
                 .toList();
 
-        // 6. HotelDetailDto 생성
-        HotelDetailDto detailDto = new HotelDetailDto(
+        return new HotelDetailDto(
                 hotel.getId(),
                 hotel.getName(),
                 hotel.getAddress(),
                 hotel.getGrade(),
-                countAmenities(hotel), // 편의시설 + 무료서비스 개수
-                getLowestRoomPrice(hotel), // 최저 객실 가격
+                countAmenities(hotel),
+                getLowestRoomPrice(hotel),
                 avgRating,
                 hotelImageUrls,
                 isFavorite,
@@ -69,8 +76,6 @@ public class HotelDetailService {
                 hotel.getOverview(),
                 roomImageUrls
         );
-
-        return detailDto;
     }
 
     private List<String> getAmenitiesList(Hotel h) {
@@ -108,7 +113,6 @@ public class HotelDetailService {
         if (h.getFreebies().isFreeWifi()) count++;
         if (h.getFreebies().isAirportShuttlebus()) count++;
         if (h.getFreebies().isFreeCancellation()) count++;
-        // amenities
         if (h.getAmenities().isFrontDesk24()) count++;
         if (h.getAmenities().isAirConditioner()) count++;
         if (h.getAmenities().isFitnessCenter()) count++;
@@ -120,5 +124,13 @@ public class HotelDetailService {
         if (h.getAmenities().isTeaCoffeeMachine()) count++;
         return count;
     }
-}
 
+    // [추가] 예약 가능 여부를 확인하는 헬퍼 메서드
+    private boolean isRoomAvailable(Room room, LocalDate checkIn, LocalDate checkOut) {
+        if (checkIn == null || checkOut == null) return true;
+        return room.getReservations().stream().noneMatch(reservation ->
+                reservation.getCheckinDate().isBefore(checkOut) &&
+                        reservation.getCheckoutDate().isAfter(checkIn)
+        );
+    }
+}

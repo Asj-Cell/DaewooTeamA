@@ -32,17 +32,24 @@ public class RoomService {
 
     // Room -> RoomDto 변환 (필요한 정보만)
     private RoomDto convertToDto(Room room) {
-        return new RoomDto(
-                room.getId(),
-                room.getRoomNumber(),
-                room.getName(),
-                room.getPrice(),
-                room.getView(),
-                room.getBed(),
-                room.getMaxGuests(),
+        // DTO에 @NoArgsConstructor와 @Setter가 있으므로,
+        // setter를 이용해 값을 설정하는 방식으로 코드를 수정합니다.
+        RoomDto dto = new RoomDto();
+        dto.setId(room.getId());
+        dto.setRoomNumber(room.getRoomNumber());
+        dto.setName(room.getName());
+        dto.setPrice(room.getPrice());
+        dto.setView(room.getView());
+        dto.setBed(room.getBed());
+        dto.setMaxGuests(room.getMaxGuests());
+        dto.setRoomImages(
                 room.getImages().stream()
-                        .map(img -> new RoomImgDto(img.getId(), img.getImageUrl(),img.getSize()))
+                        .map(img -> new RoomImgDto(img.getId(), img.getImageUrl(), img.getSize()))
                         .collect(Collectors.toList())
         );
+        // isAvailable은 날짜 정보가 없으므로 여기서는 null로 설정합니다.
+        dto.setIsAvailable(null);
+
+        return dto;
     }
 }
