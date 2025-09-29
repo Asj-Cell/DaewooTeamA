@@ -1,24 +1,24 @@
-version: '3.8'
-services:
-  mariadb:
-    container_name: mariadb_container
-    image: mariadb
-    ports:
-      - "13306:3306"
-    volumes:
-      - ./mydata:/var/lib/mysql
-    environment:
-      - TZ=Asia/Seoul
-      # .env 파일의 DB 관련 변수를 참조합니다.
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-    networks:
-      - mjc_network
+#version: '3.8'
+#services:
+#  mariadb:
+#    container_name: mariadb_container
+#    image: mariadb
+#    ports:
+#      - "13306:3306"
+#    volumes:
+#      - ./mydata:/var/lib/mysql
+#    environment:
+#      - TZ=Asia/Seoul
+#      # .env 파일의 DB 관련 변수를 참조합니다.
+#      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+#      - MARIADB_DATABASE=${MARIADB_DATABASE}
+#      - MARIADB_USER=${MARIADB_USER}
+#      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+#    networks:
+#      - mjc_network
 #
 #  boot-app:
-#    image: asjcell/backend_image:v1.0.5
+#    image: asjcell/backend_image:v1.0.7
 #    build: .
 #    container_name: boot_container
 #    ports:
@@ -47,7 +47,7 @@ services:
 #      - boot-app
 #    networks:
 #      - mjc_network
-
-networks:
-  mjc_network:
-    driver: bridge
+#
+#networks:
+#  mjc_network:
+#    driver: bridge
