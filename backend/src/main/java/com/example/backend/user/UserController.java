@@ -22,6 +22,16 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "내 비밀번호 변경", description = "로그인한 사용자의 비밀번호를 변경합니다.")
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse<String>> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ChangePasswordRequestDto requestDto) {
+        Long userId = Long.parseLong(userDetails.getUsername());
+        userService.changeUserPassword(userId, requestDto);
+        return ResponseEntity.ok(ApiResponse.success("비밀번호가 성공적으로 변경되었습니다."));
+    }
+    
     @Operation(summary = "내 프로필 이미지 변경", description = "로그인한 사용자의 프로필 이미지를 변경합니다.")
     @PutMapping("/me/profile-image")
     public ResponseEntity<ApiResponse<Map<String, String>>> updateUserProfileImage(
