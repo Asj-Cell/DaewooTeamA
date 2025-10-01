@@ -20,3 +20,7 @@ logging:
         orm:
           jdbc:
             bind: TRACE
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
