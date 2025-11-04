@@ -1,8 +1,12 @@
 <template>
   <div>
     <HelloWorld/>
-  <a href="./router/HeaderComponent.vue">헤더 테스트</a>
   </div>
+  <nav>
+    <router-link to="/">Home</router-link>
+    <router-link to="/headerComponent">HeaderComponent</router-link>
+  </nav>
+    <router-view/>
 </template>
 <script>
 import HelloWorld from './components/HelloWorld.vue'
